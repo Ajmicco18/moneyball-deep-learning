@@ -20,6 +20,7 @@ def merge_datasets():
     batting_df = load_data("2013-2025-batting.csv")
     opp_batting_df = load_data("2013-2025-opp-batting.csv")
     standings_df = load_data("2013-2025-standings.csv")
+    playoffs_df = load_data("2013-2025-playoffs.csv")
 
     # ******CLEANING STANDINGS DATA********
     standings_df = clean_standings(standings_df)
@@ -30,20 +31,30 @@ def merge_datasets():
     # *******CLEAING OPP BATTING DATA********
     opp_batting_df = clean_opp_batting(opp_batting_df)
 
-    # merging the dataframes into one dataframe before adding it to the final complete dataframe
+    # ********MERGING DATA FRAMES TO GET COMPLETE DATASET********
+    # merging batting_df and opp_batting_df on Team, Year and League columns
     merge_one = pd.merge(batting_df, opp_batting_df, on=[
                          "Team", "Year", "League"], how="inner")
 
-    merged_full = pd.merge(merge_one, standings_df, on=[
-                           "Team", "Year", "League"], how="inner")
+    # merging first merged df and standings_df on Team, Year and League columns
+    merge_two = pd.merge(merge_one, standings_df, on=[
+        "Team", "Year", "League"], how="inner")
 
+    # finally mergining the second merged df with playoffs_df on Team and Year columns
+    merged_full = pd.merge(merge_two, playoffs_df, on=[
+                           "Team", "Year"], how="inner")
+
+    # sorting the data by the year and creating a new df from it
     sorted_df = merged_full.sort_values(by=["Year"], ascending=False)
 
-    sorted_df.to_csv("./clean-data/2013-2025-complete.csv", index=False)
-
+    # reading in the original Moneyball data
     orignal_df = pd.read_csv("baseball.csv")
 
+    # concatenating the orignal data and the data from 2013-2025
     final_df = pd.concat([sorted_df, orignal_df], axis=0)
+
+    # writing the complete dataset to a .csv file
+    final_df.to_csv("./clean-data/2013-2025-complete.csv", index=False)
 
     print(final_df)
 
