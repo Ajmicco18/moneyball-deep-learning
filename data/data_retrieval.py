@@ -37,7 +37,7 @@ def scrape_data(url, data_frame, csv_name):
         df = tables[0]
 
         # setting a year column to the year at the current index
-        df["year"] = year
+        df["Year"] = year
 
         # printing the shape of the data
         print(df.shape)
@@ -52,8 +52,28 @@ def scrape_data(url, data_frame, csv_name):
     data_frame.to_csv(f"{csv_name}.csv", index=False)
 
 
+def scrape_standings_data(url, data_frame, csv_name):
+
+    for year in years:
+
+        tables = pd.read_html(url.replace(' ', year))
+
+        df = pd.concat([tables[0], tables[1], tables[2],
+                       tables[3], tables[4], tables[5]], axis=0)
+
+        df["Year"] = year
+
+        print(df.shape)
+
+        data_frame = pd.concat([data_frame, df], axis=0)
+
+        time.sleep(10)
+
+    data_frame.to_csv(f"{csv_name}.csv", index=False)
+
+
 if __name__ == "__main__":
     # load_data()
     scrape_data(opp_stats, opp_batting_df, "2013-2025-opp-batting")
-    # scrape_data(team_stats, batting_df, "2013-2025-batting")
-    # scrape_data(team_standings, standings_df, "2013-2025-standings")
+    scrape_data(team_stats, batting_df, "2013-2025-batting")
+    scrape_standings_data(team_standings, standings_df, "2013-2025-standings")
