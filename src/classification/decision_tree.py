@@ -14,6 +14,7 @@ class DecisionTree():
             min_samples_leaf=min_samples_leaf,
             random_state=42)
 
+    # ****FUNCTION TO TRAIN MODEL USING TRAINING DATA****
     def train_model(self, X_train, y_train):
 
         dt = self.dt.fit(X_train, y_train)
@@ -35,6 +36,7 @@ class DecisionTree():
 
         return accuracy, precision, recall, f1
 
+    # ****FUNCTION TO EVALUATE MODEL USING TEST DATA****
     def evaluate_model(self, X_test, y_test):
         test_preds = self.dt.predict(X_test)
 
@@ -53,25 +55,30 @@ class DecisionTree():
 
         return test_accuracy, test_precision, test_recall, test_f1
 
+    # ****FUNCTION TO MAKE GENERAL PREDICTIONS****
     def make_predictions(self, X):
 
         return self.dt.predict(X)
 
+    # ****FUNCTION TO CREATE AND SAVE CONFUSION MATRIX****
     def confusion_matrix(self, actual, pred, filename):
+
+        file_path = PLOTS_PATH / 'classifications/decision-trees' / filename
+
         ConfusionMatrixDisplay.from_predictions(
             actual, pred, display_labels=["No Playoffs", "Playoffs"])
 
-        file_path = PLOTS_PATH / 'classifications/decision-trees' / filename
         plt.savefig(file_path, bbox_inches="tight", dpi=300)
-        # plt.show()
+        plt.close()
 
+    # ****FUNCTION TO CREATE AND SAVE PRECISION-RECALL CURVE****
     def precision_recall_plot(self, actual, pred, filename):
 
         file_path = PLOTS_PATH / 'classifications/decision-trees' / filename
 
         precisions, recalls, thresholds = precision_recall_curve(actual, pred)
-        # extra code – it's not needed, just formatting
-        plt.figure(figsize=(8, 4))
+
+        plt.figure()
         plt.plot(thresholds, precisions[:-1],
                  "b--", label="Precision", linewidth=2)
         plt.plot(thresholds, recalls[:-1], "g-", label="Recall", linewidth=2)
@@ -81,11 +88,16 @@ class DecisionTree():
         plt.legend(loc="center right")
 
         plt.savefig(file_path, bbox_inches="tight", dpi=300)
+        plt.close()
 
+    # ****FUNCTION TO CREATE AND SAVE PLOT OF DECISION TREE****
     def plot(self):
-        plt.figure(figsize=(12, 8))
+
+        file_path = PLOTS_PATH / 'classifications/decision-trees/decision_tree.png'
+
+        plt.figure()
         tree.plot_tree(self.dt, filled=True, feature_names=None,
                        class_names=["No Playoffs", "Playoffs"])
-        file_path = PLOTS_PATH / 'classifications/decision-trees/decision_tree.png'
+
         plt.savefig(file_path, bbox_inches="tight", dpi=300)
-        # plt.show()
+        plt.close()

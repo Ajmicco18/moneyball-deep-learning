@@ -1,8 +1,12 @@
 from pathlib import Path
+import torch
+import torch.nn as nn
+import torchmetrics
 from src.regression.linear_regression import LinRegression
 from src.regression.neural_network import RegressionNeuralNet
 from src.classification.decision_tree import DecisionTree
 from src.data_preprocessing import *
+from src.trainer import *
 from configs.config import *
 
 
@@ -71,18 +75,39 @@ def main():
     # print(decision_tree())
     X, y = load_and_preprocess_regression_data(DATA_PATH)
 
-    X_train, x_test, y_train, y_test = split_data(X, y)
+    X_train, X_test, y_train, y_test = split_data(X, y)
 
-    X_train, x_test, y_train, y_test = convert_to_tensors(
-        X_train, x_test, y_train, y_test)
+    X_train, X_test, y_train, y_test = convert_to_tensors(
+        X_train, X_test, y_train, y_test)
 
-    nn = RegressionNeuralNet(input_size=14)
+    train_loader = create_data_loaders(X_train, y_train)
 
-    preds = nn(X_train)
+    val_loader = create_data_loaders(X_test, y_test)
+
+    torch.manual_seed(42)
+
+    model = RegressionNeuralNet(input_size=14)
+
+    learning_rate = 0.01
+
+    mse = nn.MSELoss()
+
+    rmse = torchmetrics.MeanSquaredError(squared=False)
+
+    optimizer = torch.optim.Adam(
+        model.parameters(), lr=learning_rate)
+
+    history = train_regression_model(
+        model, mse, optimizer, train_loader, val_loader, 50, rmse)
+
+    model.plot_losses(history["train_losses"], 'training_loss.png')
+
+    model.plot_learning_curve(
+        50, history["train_metrics"], history["validation_metrics"])
+
+    return history
 
     # device = nn.find_device()
-
-    print(preds)
 
 
 if __name__ == "__main__":

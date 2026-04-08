@@ -49,7 +49,7 @@ def load_and_preprocess_classification_data(data_path):
 def split_data(X, y):  # train_ratio parameter
 
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42)
+        X, y, random_state=42)
 
     return X_train, X_test, y_train, y_test
 
@@ -58,16 +58,16 @@ def convert_to_tensors(X_train, X_test, y_train, y_test):
 
     X_train = torch.FloatTensor(X_train)
     X_test = torch.FloatTensor(X_test)
-    y_train = torch.LongTensor(y_train)
-    y_test = torch.LongTensor(y_test)
+    y_train = torch.FloatTensor(y_train.values).view(-1, 1)
+    y_test = torch.FloatTensor(y_test.values).view(-1, 1)
 
     return X_train, X_test, y_train, y_test
 
 
-def create_data_loaders(X_train, y_train, batch_size=32):
+def create_data_loaders(X, y, batch_size=32):
     """Create PyTorch data loaders"""
     # Create data loaders
-    train_dataset = TensorDataset(X_train, y_train)
-    train_loader = DataLoader(train_dataset, batch_size, shuffle=True)
+    dataset = TensorDataset(X, y)
+    loader = DataLoader(dataset, batch_size, shuffle=True)
 
-    return train_loader
+    return loader

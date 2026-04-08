@@ -13,6 +13,7 @@ class LinRegression():
 
         self.lr = LinearRegression()
 
+    # ****FUNCTION TO TRAIN MODEL USING TRAINING DATA****
     def train_model(self, X_train, y_train):
 
         self.lr.fit(X_train, y_train)
@@ -25,6 +26,7 @@ class LinRegression():
 
         return lin_rmse
 
+    # ****FUNCTION TO EVALUATE MODEL USING TEST DATA****
     def evaluate_model(self, X_test, y_test):
         test_preds = self.lr.predict(X_test)
 
@@ -34,10 +36,12 @@ class LinRegression():
 
         return (test_rmse)
 
+    # ****FUNCTION TO MAKE GENERAL PREDICTIONS****
     def make_predictions(self, X):
 
         return self.lr.predict(X)
 
+    # ****FUNCTION TO CALCULATE CROSS-VALIDATION RMSE****
     def get_cv_mean_rmse(self, X_train, y_train):
 
         cv_rmse = -cross_val_score(self.lr, X_train, y_train,
@@ -47,6 +51,7 @@ class LinRegression():
 
         return average_rmse
 
+    # ****FUNCTION TO CALCULATE SUM OF SQUARED RESIDUALS****
     def calculate_ssr(self, y_test, test_preds):
         comp_df = pd.DataFrame({
             "Actual": y_test.values,
@@ -58,31 +63,32 @@ class LinRegression():
 
         return comp_df, ssr
 
+    # ****FUNCTION TO GET COEFFICIENTS FOR EACH FEATURE****
     def get_coefficients(self):
 
         coefficients = self.lr.coef_
 
         return coefficients
 
+    # ****FUNCTION TO GET MODEL'S INTERCEPT****
     def get_intercept(self):
 
         intercept = self.lr.intercept_
 
         return intercept
 
+    # ****FUNCTION TO PLOT BEST FIT REGRESSION LINE****
     def plot(self, y, preds, filename):
-        plt.figure(figsize=(10, 6))
 
+        filepath = PLOTS_PATH / 'regressions/linear-regression' / filename
+
+        plt.figure()
         plt.scatter(y, preds, color='blue', alpha=0.5)
         plt.plot([y.min(), y.max()], [y.min(), y.max()],
                  color='red', linewidth=2)
-
         plt.title('Actual vs. Predicted')
         plt.xlabel('Actual Values')
         plt.ylabel('Predicted Values')
 
-        filepath = PLOTS_PATH / 'regressions/linear-regression' / filename
-
         plt.savefig(filepath,  bbox_inches="tight", dpi=300)
-
-        # plt.show()
+        plt.close()
