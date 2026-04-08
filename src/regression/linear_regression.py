@@ -1,6 +1,8 @@
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import root_mean_squared_error
 from sklearn.model_selection import cross_val_score
+from configs.config import PLOTS_PATH
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
@@ -19,12 +21,16 @@ class LinRegression():
 
         lin_rmse = root_mean_squared_error(y_train, preds)
 
+        self.plot(y_train, preds, 'training_fit.png')
+
         return lin_rmse
 
     def evaluate_model(self, X_test, y_test):
         test_preds = self.lr.predict(X_test)
 
         test_rmse = root_mean_squared_error(y_test, test_preds)
+
+        self.plot(y_test, test_preds, 'test_fit.png')
 
         return (test_rmse)
 
@@ -64,5 +70,19 @@ class LinRegression():
 
         return intercept
 
-    def plot(self):
-        return
+    def plot(self, y, preds, filename):
+        plt.figure(figsize=(10, 6))
+
+        plt.scatter(y, preds, color='blue', alpha=0.5)
+        plt.plot([y.min(), y.max()], [y.min(), y.max()],
+                 color='red', linewidth=2)
+
+        plt.title('Actual vs. Predicted')
+        plt.xlabel('Actual Values')
+        plt.ylabel('Predicted Values')
+
+        filepath = PLOTS_PATH / 'regressions/linear-regression' / filename
+
+        plt.savefig(filepath,  bbox_inches="tight", dpi=300)
+
+        # plt.show()

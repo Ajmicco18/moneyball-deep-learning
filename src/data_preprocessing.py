@@ -54,19 +54,7 @@ def split_data(X, y):  # train_ratio parameter
     return X_train, X_test, y_train, y_test
 
 
-def create_data_loaders(X_train, y_train, batch_size=32):
-    """Create PyTorch data loaders"""
-    # Create data loaders
-    train_dataset = TensorDataset(X_train, y_train)
-    train_loader = DataLoader(train_dataset, batch_size, shuffle=True)
-
-    return train_loader
-
-
-"""
-def split_data_tensor(X, y):
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42)
+def convert_to_tensors(X_train, X_test, y_train, y_test):
 
     X_train = torch.FloatTensor(X_train)
     X_test = torch.FloatTensor(X_test)
@@ -74,4 +62,12 @@ def split_data_tensor(X, y):
     y_test = torch.LongTensor(y_test)
 
     return X_train, X_test, y_train, y_test
-"""
+
+
+def create_data_loaders(X_train, y_train, batch_size=32):
+    """Create PyTorch data loaders"""
+    # Create data loaders
+    train_dataset = TensorDataset(X_train, y_train)
+    train_loader = DataLoader(train_dataset, batch_size, shuffle=True)
+
+    return train_loader

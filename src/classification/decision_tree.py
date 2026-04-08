@@ -1,6 +1,6 @@
 from sklearn import tree
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import accuracy_score, ConfusionMatrixDisplay
+from sklearn.metrics import accuracy_score, precision_score, recall_score, precision_recall_curve, f1_score, ConfusionMatrixDisplay
 import matplotlib.pyplot as plt
 from configs.config import PLOTS_PATH
 
@@ -20,20 +20,38 @@ class DecisionTree():
 
         preds = dt.predict(X_train)
 
-        self.confusion_matrix(y_train, preds, 'train_confusion_matrix')
-
         accuracy = accuracy_score(y_train, preds)
 
-        return accuracy
+        precision = precision_score(y_train, preds)
+
+        recall = recall_score(y_train, preds)
+
+        f1 = f1_score(y_train, preds)
+
+        self.confusion_matrix(y_train, preds, 'train_confusion_matrix.png')
+
+        self.precision_recall_plot(
+            y_train, preds, 'train_precision_recall_curve.png')
+
+        return accuracy, precision, recall, f1
 
     def evaluate_model(self, X_test, y_test):
         test_preds = self.dt.predict(X_test)
 
         test_accuracy = accuracy_score(y_test, test_preds)
 
-        self.confusion_matrix(y_test, test_preds, 'eval_confusion_matrix')
+        test_precision = precision_score(y_test, test_preds)
 
-        return test_accuracy
+        test_recall = recall_score(y_test, test_preds)
+
+        test_f1 = f1_score(y_test, test_preds)
+
+        self.confusion_matrix(y_test, test_preds, 'eval_confusion_matrix.png')
+
+        self.precision_recall_plot(
+            y_test, test_preds, 'eval_precision_recall_curve.png')
+
+        return test_accuracy, test_precision, test_recall, test_f1
 
     def make_predictions(self, X):
 
@@ -46,6 +64,23 @@ class DecisionTree():
         file_path = PLOTS_PATH / 'classifications/decision-trees' / filename
         plt.savefig(file_path, bbox_inches="tight", dpi=300)
         # plt.show()
+
+    def precision_recall_plot(self, actual, pred, filename):
+
+        file_path = PLOTS_PATH / 'classifications/decision-trees' / filename
+
+        precisions, recalls, thresholds = precision_recall_curve(actual, pred)
+        # extra code – it's not needed, just formatting
+        plt.figure(figsize=(8, 4))
+        plt.plot(thresholds, precisions[:-1],
+                 "b--", label="Precision", linewidth=2)
+        plt.plot(thresholds, recalls[:-1], "g-", label="Recall", linewidth=2)
+        plt.vlines(0.5, 0, 1.0, "k", "dotted", label="threshold")
+        plt.xlabel("Threshold")
+        plt.grid()
+        plt.legend(loc="center right")
+
+        plt.savefig(file_path, bbox_inches="tight", dpi=300)
 
     def plot(self):
         plt.figure(figsize=(12, 8))
