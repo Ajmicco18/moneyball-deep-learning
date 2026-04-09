@@ -8,6 +8,7 @@ from sklearn.pipeline import make_pipeline
 from sklearn.compose import make_column_selector, make_column_transformer
 from sklearn.model_selection import train_test_split
 
+# ****GENERATING DATA PREPROCESSING PIPELINES****
 num_pipeline = make_pipeline(SimpleImputer(
     strategy="median"), StandardScaler())
 
@@ -21,9 +22,9 @@ proprocessing = make_column_transformer(
 
 
 def load_and_preprocess_regression_data(data_path):
-    """
-    Function that will preprocess the data by scaling it and removing/replace any null values
-    """
+
+   # ****FUNCTION THAT LOADS AND PREPROCESSES DATA PRIOR TO USAGE BY REGRESSION MODELS****
+
     data = pd.read_csv(data_path)
 
     X = data.drop(columns=["W"])
@@ -36,6 +37,8 @@ def load_and_preprocess_regression_data(data_path):
 
 def load_and_preprocess_classification_data(data_path):
 
+    # ****FUNCTION THAT LOADS AND PREPROCESSES DATA PRIOR TO USAGE BY CLASSIFICATION MODELS****
+
     data = pd.read_csv(data_path)
 
     X = data.drop(columns=["Playoffs", "RankSeason", "RankPlayoffs"])
@@ -46,7 +49,9 @@ def load_and_preprocess_classification_data(data_path):
     return X_prepared, y
 
 
-def split_data(X, y):  # train_ratio parameter
+def split_data(X, y):
+
+    # ****FUNCTION THAT SPLITS DATA INTO TRAINING AND TEST SETS****
 
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, random_state=42)
@@ -55,6 +60,8 @@ def split_data(X, y):  # train_ratio parameter
 
 
 def convert_to_tensors(X_train, X_test, y_train, y_test):
+
+    # ****FUNCTION THAT CONVERTS DATA SPLITS INTO TENSORS FOR PYTORCH****
 
     X_train = torch.FloatTensor(X_train)
     X_test = torch.FloatTensor(X_test)
@@ -65,9 +72,22 @@ def convert_to_tensors(X_train, X_test, y_train, y_test):
 
 
 def create_data_loaders(X, y, batch_size=32):
-    """Create PyTorch data loaders"""
+
+    # ****FUNCTION THAT TURNS FEATURES AND TARGET VARIABLES INTO A DATALOADER****
+
     # Create data loaders
     dataset = TensorDataset(X, y)
     loader = DataLoader(dataset, batch_size, shuffle=True)
 
     return loader
+
+
+"""
+def convert_to_classification_tensors(X_train, X_test, y_train, y_test):
+
+    X_train = torch.FloatTensor(X_train)
+    X_test = torch.FloatTensor(X_test)
+    y_train = torch.LongTensor(y_train.values)
+    y_test = torch.LongTensor(y_test.values)
+
+    return X_train, X_test, y_train, y_test"""
