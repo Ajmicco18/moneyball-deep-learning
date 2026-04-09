@@ -8,4 +8,7 @@ class RecurrentNeuralNet(nn.Module):
 
     def forward(self, x):
 
+        # one layer takes in categorical variables
+        # another layer takes in numerical
+
         return
