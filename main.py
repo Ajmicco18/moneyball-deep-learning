@@ -4,6 +4,7 @@ import torch.nn as nn
 import torchmetrics
 from src.regression.linear_regression import LinRegression
 from src.regression.neural_network import RegressionNeuralNet
+from src.regression.deep_nn import DeepNeuralNet
 from src.classification.decision_tree import DecisionTree
 from src.classification.neural_network import ClassificationNeuralNet
 from src.data_preprocessing import *
@@ -107,15 +108,6 @@ def decision_tree():
 
 
 def classification_nn():
-
-    return
-
-
-def main():
-    # print(lin_reg())
-    # print(decision_tree())
-    # print(regression_nn())
-
     X, y = load_and_preprocess_classification_data(DATA_PATH)
 
     X_train, X_test, y_train, y_test = split_data(X, y)
@@ -150,6 +142,42 @@ def main():
 
     model.plot_learning_curve(
         50, history["train_metrics"], history["validation_metrics"])
+
+    return history
+
+
+def main():
+    # print(lin_reg())
+    # print(decision_tree())
+    # print(regression_nn())
+    # print(classification_nn())
+
+    X, y = load_and_preprocess_regression_data(DATA_PATH)
+
+    X_train, X_test, y_train, y_test = split_data(X, y)
+
+    X_train, X_test, y_train, y_test = convert_to_tensors(
+        X_train, X_test, y_train, y_test)
+
+    train_loader = create_data_loaders(X_train, y_train)
+
+    val_loader = create_data_loaders(X_test, y_test)
+
+    torch.manual_seed(42)
+
+    model = DeepNeuralNet(input_size=14)
+
+    learning_rate = 0.02
+
+    mse = nn.MSELoss()
+
+    rmse = torchmetrics.MeanSquaredError(squared=False)
+
+    optimizer = torch.optim.Adam(
+        model.parameters(), lr=learning_rate)
+
+    history = train_model(model, mse, optimizer,
+                          train_loader, val_loader, 50, rmse)
 
     return history
 
