@@ -82,12 +82,9 @@ def create_data_loaders(X, y, batch_size=32):
     return loader
 
 
-"""
-def convert_to_classification_tensors(X_train, X_test, y_train, y_test):
+def create_wide_deep_data_loaders(X_1, X_2, y, batch_size=32):
 
-    X_train = torch.FloatTensor(X_train)
-    X_test = torch.FloatTensor(X_test)
-    y_train = torch.LongTensor(y_train.values)
-    y_test = torch.LongTensor(y_test.values)
+    dataset = TensorDataset(X_1, X_2, y)
+    loader = DataLoader(dataset, batch_size, shuffle=True)
 
-    return X_train, X_test, y_train, y_test"""
+    return loader

@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 
 
-class DeepNeuralNet(nn.Module):
+class WideAndDeepNN(nn.Module):
     def __init__(self, input_size):
         super().__init__()
         self.model = nn.Sequential(
@@ -21,3 +21,5 @@ class DeepNeuralNet(nn.Module):
         wide_and_deep = torch.concat([X, deep_output], dim=1)
 
         return self.output_layer(wide_and_deep)
+
+    # ADD PLOTTING FUNCTIONS

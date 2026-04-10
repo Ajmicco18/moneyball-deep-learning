@@ -4,9 +4,10 @@ import torch.nn as nn
 import torchmetrics
 from src.regression.linear_regression import LinRegression
 from src.regression.neural_network import RegressionNeuralNet
-from src.regression.deep_nn import DeepNeuralNet
+from src.regression.wide_deep_nn import WideAndDeepNN
 from src.classification.decision_tree import DecisionTree
 from src.classification.neural_network import ClassificationNeuralNet
+from src.classification.multi_layer_input_nn import MultiInputNeuralNet
 from src.data_preprocessing import *
 from src.trainer import *
 from configs.config import *
@@ -73,6 +74,38 @@ def regression_nn():
 
     model.plot_learning_curve(
         50, history["train_metrics"], history["validation_metrics"])
+
+    return history
+
+
+def regression_wide_and_deep_nn():
+
+    X, y = load_and_preprocess_regression_data(DATA_PATH)
+
+    X_train, X_test, y_train, y_test = split_data(X, y)
+
+    X_train, X_test, y_train, y_test = convert_to_tensors(
+        X_train, X_test, y_train, y_test)
+
+    train_loader = create_data_loaders(X_train, y_train)
+
+    val_loader = create_data_loaders(X_test, y_test)
+
+    torch.manual_seed(42)
+
+    model = WideAndDeepNN(input_size=14)
+
+    learning_rate = 0.02
+
+    mse = nn.MSELoss()
+
+    rmse = torchmetrics.MeanSquaredError(squared=False)
+
+    optimizer = torch.optim.Adam(
+        model.parameters(), lr=learning_rate)
+
+    history = train_model(model, mse, optimizer,
+                          train_loader, val_loader, 50, rmse)
 
     return history
 
@@ -151,33 +184,39 @@ def main():
     # print(decision_tree())
     # print(regression_nn())
     # print(classification_nn())
+    # print(regression_wide_and_deep_nn())
 
-    X, y = load_and_preprocess_regression_data(DATA_PATH)
+    X, y = load_and_preprocess_classification_data(DATA_PATH)
 
     X_train, X_test, y_train, y_test = split_data(X, y)
 
     X_train, X_test, y_train, y_test = convert_to_tensors(
         X_train, X_test, y_train, y_test)
 
-    train_loader = create_data_loaders(X_train, y_train)
+    train_loader = create_wide_deep_data_loaders(
+        X_train[:, [0, 4, 5, 6, 7, 10, 11]], X_train[:, [1, 2, 3, 8, 9]], y_train)
 
-    val_loader = create_data_loaders(X_test, y_test)
+    val_loader = create_wide_deep_data_loaders(
+        X_test[:, [0, 4, 5, 6, 7, 10, 11]], X_test[:, [1, 2, 3, 8, 9]], y_test)
 
     torch.manual_seed(42)
 
-    model = DeepNeuralNet(input_size=14)
+    model = MultiInputNeuralNet(7)
 
-    learning_rate = 0.02
+    learning_rate = 0.01
 
-    mse = nn.MSELoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
-    rmse = torchmetrics.MeanSquaredError(squared=False)
+    xentropy = nn.BCEWithLogitsLoss()
 
-    optimizer = torch.optim.Adam(
-        model.parameters(), lr=learning_rate)
+    f1 = torchmetrics.F1Score(task="binary")
+    precision = torchmetrics.Precision(task="binary")
+    recall = torchmetrics.Recall(task="binary")
+    confusion = torchmetrics.ConfusionMatrix(task="binary")
+    accuracy = torchmetrics.Accuracy(task="binary")
 
-    history = train_model(model, mse, optimizer,
-                          train_loader, val_loader, 50, rmse)
+    history = train_multi_input_model(model, xentropy, optimizer,
+                                      train_loader, val_loader, 50, f1)
 
     return history
 

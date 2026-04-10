@@ -63,7 +63,7 @@ class DecisionTree():
     # ****FUNCTION TO CREATE AND SAVE CONFUSION MATRIX****
     def confusion_matrix(self, actual, pred, filename):
 
-        file_path = PLOTS_PATH / 'classifications/decision-trees' / filename
+        file_path = PLOTS_PATH / 'classifications/decision_trees' / filename
 
         ConfusionMatrixDisplay.from_predictions(
             actual, pred, display_labels=["No Playoffs", "Playoffs"])
@@ -74,7 +74,7 @@ class DecisionTree():
     # ****FUNCTION TO CREATE AND SAVE PRECISION-RECALL CURVE****
     def precision_recall_plot(self, actual, pred, filename):
 
-        file_path = PLOTS_PATH / 'classifications/decision-trees' / filename
+        file_path = PLOTS_PATH / 'classifications/decision_trees' / filename
 
         precisions, recalls, thresholds = precision_recall_curve(actual, pred)
 
@@ -93,7 +93,7 @@ class DecisionTree():
     # ****FUNCTION TO CREATE AND SAVE PLOT OF DECISION TREE****
     def plot(self):
 
-        file_path = PLOTS_PATH / 'classifications/decision-trees/decision_tree.png'
+        file_path = PLOTS_PATH / 'classifications/decision_trees/decision_tree.png'
 
         plt.figure()
         tree.plot_tree(self.dt, filled=True, feature_names=None,

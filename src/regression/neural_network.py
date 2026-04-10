@@ -37,7 +37,7 @@ class RegressionNeuralNet(nn.Module):
      # ****FUNCTION TO PLOT AND SAVE TRAINING LOSSES****
     def plot_losses(self, losses):
 
-        filepath = PLOTS_PATH / 'regressions/neural-net/training_loss.png'
+        filepath = PLOTS_PATH / 'regressions/neural_net/training_loss.png'
 
         plt.figure()
         plt.plot(losses)
@@ -53,7 +53,7 @@ class RegressionNeuralNet(nn.Module):
     # ****FUNCTION TO PLOT AND SAVE MODEL'S LEARNING CURVE****
     def plot_learning_curve(self, n_epochs, train_metrics, val_metrics):
 
-        filepath = PLOTS_PATH / 'regressions/neural-net/learning_curve.png'
+        filepath = PLOTS_PATH / 'regressions/neural_net/learning_curve.png'
 
         plt.figure()
         plt.plot(np.arange(n_epochs) + 0.5, train_metrics, ".--",

@@ -80,7 +80,7 @@ class LinRegression():
     # ****FUNCTION TO PLOT BEST FIT REGRESSION LINE****
     def plot(self, y, preds, filename):
 
-        filepath = PLOTS_PATH / 'regressions/linear-regression' / filename
+        filepath = PLOTS_PATH / 'regressions/linear_regression' / filename
 
         plt.figure()
         plt.scatter(y, preds, color='blue', alpha=0.5)
