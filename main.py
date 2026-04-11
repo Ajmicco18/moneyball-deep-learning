@@ -1,4 +1,3 @@
-from pathlib import Path
 import torch
 import torch.nn as nn
 import torchmetrics
@@ -7,10 +6,15 @@ from src.regression.neural_network import RegressionNeuralNet
 from src.regression.wide_deep_nn import WideAndDeepNN
 from src.classification.decision_tree import DecisionTree
 from src.classification.neural_network import ClassificationNeuralNet
-from src.classification.multi_layer_input_nn import MultiInputNeuralNet
+from src.classification.multi_input_nn import MultiInputNeuralNet
 from src.data_preprocessing import *
 from src.trainer import *
 from configs.config import *
+
+# NOTE: INTEND TO FURTHER MODULARIZE THIS PROJECT SO I DO NOT HAVE TO CALL EACH FUNCTION IN THE WAY BELOW
+# ****FUNCTIONS TO CALL REGRESSION MODEL TRAINING****
+
+# Linear Regression Model
 
 
 def lin_reg():
@@ -40,6 +44,8 @@ def lin_reg():
         Test RMSE: {test_rmse},
         Residual Dataframe: \n {comp_df},
         Sum of Squared Residuals: {ssr}"""
+
+# Regression Neural Net Model
 
 
 def regression_nn():
@@ -75,7 +81,17 @@ def regression_nn():
     model.plot_learning_curve(
         50, history["train_metrics"], history["validation_metrics"])
 
-    return history
+    model.plot_neural_net(model)
+
+    avg_train_rmse = np.mean(history["train_metrics"])
+    avg_val_rmse = np.mean(history["validation_metrics"])
+
+    return f"""
+    Average Training RMSE: {avg_train_rmse:.4f}
+    Average Validation RMSE: {avg_val_rmse:.4f}
+    """
+
+# Wide and Deep Regression Neural Net Model
 
 
 def regression_wide_and_deep_nn():
@@ -107,7 +123,24 @@ def regression_wide_and_deep_nn():
     history = train_model(model, mse, optimizer,
                           train_loader, val_loader, 50, rmse)
 
-    return history
+    model.plot_losses(history["train_losses"])
+
+    model.plot_learning_curve(
+        50, history["train_metrics"], history["validation_metrics"])
+
+    model.plot_neural_net(model)
+
+    avg_train_rmse = np.mean(history["train_metrics"])
+    avg_val_rmse = np.mean(history["validation_metrics"])
+
+    return f"""
+    Average Training RMSE: {avg_train_rmse:.4f}
+    Average Validation RMSE: {avg_val_rmse:.4f}
+    """
+
+# ****FUNCTIONS TO CALL CLASSIFICATION MODEL TRAINING****
+
+# Decision Tree Classifier Model
 
 
 def decision_tree():
@@ -138,6 +171,8 @@ def decision_tree():
         Precision: {test_precision},
         Recall: {test_recall},
         F1-Score: {test_f1},"""
+
+# Classification Neural Net Model
 
 
 def classification_nn():
@@ -176,16 +211,20 @@ def classification_nn():
     model.plot_learning_curve(
         50, history["train_metrics"], history["validation_metrics"])
 
-    return history
+    model.plot_neural_net(model)
+
+    avg_train_f1 = np.mean(history["train_metrics"])
+    avg_val_f1 = np.mean(history["validation_metrics"])
+
+    return f"""
+    Average Training F1-Score: {avg_train_f1:.4f}
+    Average Validation F1-Score: {avg_val_f1:.4f}
+    """
+
+# Multi-Input Classification Neural Net Model
 
 
-def main():
-    # print(lin_reg())
-    # print(decision_tree())
-    # print(regression_nn())
-    # print(classification_nn())
-    # print(regression_wide_and_deep_nn())
-
+def classification_multi_input_nn():
     X, y = load_and_preprocess_classification_data(DATA_PATH)
 
     X_train, X_test, y_train, y_test = split_data(X, y)
@@ -218,7 +257,31 @@ def main():
     history = train_multi_input_model(model, xentropy, optimizer,
                                       train_loader, val_loader, 50, f1)
 
-    return history
+    model.plot_losses(history["train_losses"])
+
+    model.plot_learning_curve(
+        50, history["train_metrics"], history["validation_metrics"])
+
+    model.plot_neural_net(model)
+
+    avg_train_f1 = np.mean(history["train_metrics"])
+    avg_val_f1 = np.mean(history["validation_metrics"])
+
+    return f"""
+    Average Training F1-Score: {avg_train_f1:.4f}
+    Average Validation F1-Score: {avg_val_f1:.4f}
+    """
+
+
+def main():
+    # print(lin_reg())
+    # print(decision_tree())
+    # print(regression_nn())
+    # print(classification_nn())
+    # print(regression_wide_and_deep_nn())
+    # print(classification_multi_input_nn())
+
+    return
 
 
 if __name__ == "__main__":

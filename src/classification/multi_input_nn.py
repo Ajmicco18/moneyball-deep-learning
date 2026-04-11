@@ -6,39 +6,31 @@ import matplotlib.pyplot as plt
 from configs.config import PLOTS_PATH
 
 
-class RegressionNeuralNet(nn.Module):
-    def __init__(self, input_size=14):
+class MultiInputNeuralNet(nn.Module):
+    def __init__(self, input_size=7):
 
         super().__init__()
-
         self.model = nn.Sequential(
-            nn.Linear(input_size, 25),
-            nn.Sigmoid(),
-            nn.Linear(25, 10),
-            nn.Sigmoid(),
-            nn.Linear(10, 1)
+            nn.Linear(input_size-2, 50),
+            nn.ReLU(),
+            nn.Linear(50, 40),
+            nn.ReLU(),
+            nn.Linear(40, 30),
+            nn.ReLU()
         )
+        self.output_layer = nn.Linear(30+7, 1)
 
-    # ****FUNCTION TO DEFINE FORWARD STEP OF NEURAL NETWORK****
-    def forward(self, x):
+    def forward(self, X_wide, X_deep):
 
-        return self.model(x)
+        deep_output = self.model(X_deep)
+        wide_and_deep = torch.concat([X_wide, deep_output], dim=1)
 
-     # ****FUNCTION TO DEFINE WHICH HARDWARE DEVICE WE ARE USING****
-    def find_device(self):
-        if torch.cuda.is_available():
-            device = "cuda"
-        elif torch.backends.mps.is_available():
-            device = "mps"
-        else:
-            device = "cpu"
-
-        return device
+        return self.output_layer(wide_and_deep)
 
      # ****FUNCTION TO PLOT AND SAVE TRAINING LOSSES****
     def plot_losses(self, losses):
 
-        filepath = PLOTS_PATH / 'regressions/neural_net/training_loss.png'
+        filepath = PLOTS_PATH / 'classifications/multi_input_nn/training_loss.png'
 
         plt.figure()
         plt.plot(losses)
@@ -54,7 +46,7 @@ class RegressionNeuralNet(nn.Module):
     # ****FUNCTION TO PLOT AND SAVE MODEL'S LEARNING CURVE****
     def plot_learning_curve(self, n_epochs, train_metrics, val_metrics):
 
-        filepath = PLOTS_PATH / 'regressions/neural_net/learning_curve.png'
+        filepath = PLOTS_PATH / 'classifications/multi_input_nn/learning_curve.png'
 
         plt.figure()
         plt.plot(np.arange(n_epochs) + 0.5, train_metrics, ".--",
@@ -62,19 +54,20 @@ class RegressionNeuralNet(nn.Module):
         plt.plot(np.arange(n_epochs) + 1.0, val_metrics, ".-",
                  label="Validation")
         plt.xlabel("Epoch")
-        plt.ylabel("RMSE")
+        plt.ylabel("Accuracy")
         plt.grid()
         plt.title("Learning curves")
-        plt.axis([0, 50, 0, 70])
+        plt.axis([0, 50, 0.5, 1.0])
         plt.legend()
 
         plt.savefig(filepath, bbox_inches="tight", dpi=300)
         plt.close()
 
-    # ****FUNCTION TO PLOT NEURAL NET ARCHITECTURE****
+     # ****FUNCTION TO PLOT NEURAL NET ARCHITECTURE****
     def plot_neural_net(self, model):
-        filepath = PLOTS_PATH / 'regressions/neural_net/'
+        filepath = PLOTS_PATH / 'classifications/multi_input_nn/'
 
-        model_graph = draw_graph(model, input_size=(1, 14), device="cpu")
+        model_graph = draw_graph(
+            model, input_size=[(1, 7), (1, 5)], device="cpu")
         model_graph.visual_graph.render(directory=filepath,
-                                        filename="regression_neural_net", format='png', cleanup=True)
+                                        filename="multi_input_neural_net", format='png', cleanup=True)
