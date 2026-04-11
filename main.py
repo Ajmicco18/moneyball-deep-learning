@@ -304,11 +304,11 @@ def plot_learning_curves_comparison(nn1_val, nn2_val, nn1_label, nn2_label, plot
 def main():
 
     # ****FUNCTION CALLS TO RUN ALL MODELS****
-    # print(lin_reg())
-    # print(decision_tree())
+    print(lin_reg())
     # print(regression_nn())
-    # print(classification_nn())
     # print(regression_wide_and_deep_nn())
+    print(decision_tree())
+    # print(classification_nn())
     # print(classification_multi_input_nn())
 
     # ****RUNNING MODELS TO GENERATE VALIDATION METRIC COMPARISON GRAPH****
