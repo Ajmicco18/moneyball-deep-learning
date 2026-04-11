@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torchmetrics
+import matplotlib.pyplot as plt
 from src.regression.linear_regression import LinRegression
 from src.regression.neural_network import RegressionNeuralNet
 from src.regression.wide_deep_nn import WideAndDeepNN
@@ -86,10 +87,12 @@ def regression_nn():
     avg_train_rmse = np.mean(history["train_metrics"])
     avg_val_rmse = np.mean(history["validation_metrics"])
 
-    return f"""
+    print(f"""
     Average Training RMSE: {avg_train_rmse:.4f}
     Average Validation RMSE: {avg_val_rmse:.4f}
-    """
+    """)
+
+    return history
 
 # Wide and Deep Regression Neural Net Model
 
@@ -133,10 +136,11 @@ def regression_wide_and_deep_nn():
     avg_train_rmse = np.mean(history["train_metrics"])
     avg_val_rmse = np.mean(history["validation_metrics"])
 
-    return f"""
+    print(f"""
     Average Training RMSE: {avg_train_rmse:.4f}
     Average Validation RMSE: {avg_val_rmse:.4f}
-    """
+    """)
+    return history
 
 # ****FUNCTIONS TO CALL CLASSIFICATION MODEL TRAINING****
 
@@ -216,10 +220,12 @@ def classification_nn():
     avg_train_f1 = np.mean(history["train_metrics"])
     avg_val_f1 = np.mean(history["validation_metrics"])
 
-    return f"""
+    print(f"""
     Average Training F1-Score: {avg_train_f1:.4f}
     Average Validation F1-Score: {avg_val_f1:.4f}
-    """
+    """)
+
+    return history
 
 # Multi-Input Classification Neural Net Model
 
@@ -267,19 +273,54 @@ def classification_multi_input_nn():
     avg_train_f1 = np.mean(history["train_metrics"])
     avg_val_f1 = np.mean(history["validation_metrics"])
 
-    return f"""
+    print(f"""
     Average Training F1-Score: {avg_train_f1:.4f}
     Average Validation F1-Score: {avg_val_f1:.4f}
-    """
+    """)
+
+    return history
+
+
+def plot_learning_curves_comparison(nn1_val, nn2_val, nn1_label, nn2_label, plot_title, y_label, filename):
+
+    plt.figure(figsize=(10, 6))
+
+    plt.plot(nn1_val, label=nn1_label, color='#888888',
+             linewidth=3, linestyle='--')
+    plt.plot(nn2_val, label=nn2_label, color='#1f77b4', linewidth=3)
+
+    plt.title(plot_title, fontsize=20, pad=20, fontweight='bold')
+    plt.ylabel(y_label, fontsize=16, labelpad=15)
+    plt.xlabel('Epochs', fontsize=16, labelpad=15)
+    plt.xticks(fontsize=14)
+    plt.yticks(fontsize=14)
+
+    plt.legend(fontsize=14, loc='upper right')
+
+    filepath = PLOTS_PATH / filename
+    plt.savefig(filepath, bbox_inches='tight', dpi=300)
 
 
 def main():
+
+    # ****FUNCTION CALLS TO RUN ALL MODELS****
     # print(lin_reg())
     # print(decision_tree())
     # print(regression_nn())
     # print(classification_nn())
     # print(regression_wide_and_deep_nn())
     # print(classification_multi_input_nn())
+
+    # ****RUNNING MODELS TO GENERATE VALIDATION METRIC COMPARISON GRAPH****
+    class_nn = classification_nn()
+    class_multi_nn = classification_multi_input_nn()
+    reg_nn = regression_nn()
+    wide_nn = regression_wide_and_deep_nn()
+
+    plot_learning_curves_comparison(class_nn["validation_metrics"], class_multi_nn["validation_metrics"], "Neural Net", "Multi-Input Neural Net",
+                                    "Comparing F1-Score in Neural Nets", "F1-Score", "classifications/f1-score-comparison.png")
+    plot_learning_curves_comparison(reg_nn["validation_metrics"], wide_nn["validation_metrics"], "Neural Net", "Wide & Deep Neural Net",
+                                    "Comparing RMSE in Neural Nets", "RMSE", "regressions/rmse-comparison.png")
 
     return
 
