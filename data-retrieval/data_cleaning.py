@@ -1,4 +1,5 @@
 import pandas as pd
+from configs.config import DATA_PATH
 
 
 def load_data(dataset):
@@ -54,7 +55,7 @@ def merge_datasets():
     final_df = pd.concat([sorted_df, orignal_df], axis=0)
 
     # writing the complete dataset to a .csv file
-    final_df.to_csv("./clean-data/2013-2025-complete.csv", index=False)
+    final_df.to_csv(DATA_PATH, index=False)
 
     print(final_df)
 
